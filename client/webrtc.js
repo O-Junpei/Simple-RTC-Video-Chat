@@ -8,67 +8,6 @@ let negotiationneededCounter = 0;
 let isOffer = false;
 
 
-const wsUrl = 'ws://localhost:3001/';
-const ws = new WebSocket(wsUrl);
-ws.onopen = (evt) => {
-    console.log('ws open()');
-};
-ws.onerror = (err) => {
-    console.error('ws onerror() ERR:', err);
-};
-ws.onmessage = (evt) => {
-    console.log('ws onmessage() data:', evt.data);
-    const message = JSON.parse(evt.data);
-    console.log('@@@@@@@@@@@@');
-    console.log(message);
-    console.log('@@@@@@@@@@@@');
-    switch(message.type){
-        case 'offer': {
-            console.log('Received offer ...');
-            textToReceiveSdp.value = message.sdp;
-            setOffer(message);
-            break;
-        }
-        case 'answer': {
-            console.log('Received answer ...');
-            textToReceiveSdp.value = message.sdp;
-            setAnswer(message);
-            break;
-        }
-        case 'candidate': {
-            console.log('Received ICE candidate ...');
-            const candidate = new RTCIceCandidate(message.ice);
-            console.log(candidate);
-            addIceCandidate(candidate);
-            break;
-        }
-        default: {
-            console.log("Invalid message");
-            break;
-         }
-    }
-};
-
-// ICE candaidate受信時にセットする
-function addIceCandidate(candidate) {
-    if (peerConnection) {
-        peerConnection.addIceCandidate(candidate);
-    }
-    else {
-        console.error('PeerConnection not exist!');
-        return;
-    }
-}
-
-// ICE candidate生成時に送信する
-function sendIceCandidate(candidate) {
-    console.log('---sending ICE candidate ---');
-    const message = JSON.stringify({ type: 'candidate', ice: candidate });
-    console.log('sending candidate=' + message);
-    ws.send(message);
-}
-
-
 // getUserMediaでカメラ、マイクにアクセス
 async function startVideo() {
     try{
@@ -99,13 +38,12 @@ function prepareNewConnection(isOffer) {
 
     // ICE Candidateを収集したときのイベント
     peer.onicecandidate = evt => {
-      if (evt.candidate) {
-          console.log(evt.candidate);
-          sendIceCandidate(evt.candidate);
-      } else {
-          console.log('empty ice event');
-          // sendSdp(peer.localDescription);
-      }
+        if (evt.candidate) {
+            console.log(evt.candidate);
+        } else {
+            console.log('empty ice event');
+            sendSdp(peer.localDescription);
+        }
     };
 
     // Offer側でネゴシエーションが必要になったときの処理
@@ -141,13 +79,8 @@ function prepareNewConnection(isOffer) {
 function sendSdp(sessionDescription) {
     console.log('---sending sdp ---');
     textForSendSdp.value = sessionDescription.sdp;
-    /*---
-     textForSendSdp.focus();
-     textForSendSdp.select();
-     ----*/
-    const message = JSON.stringify(sessionDescription);
-    console.log('sending SDP=' + message);
-    ws.send(message);
+    textForSendSdp.focus();
+    textForSendSdp.select();
 }
 
 // Connectボタンが押されたらWebRTCのOffer処理を開始
@@ -228,23 +161,4 @@ async function setAnswer(sessionDescription) {
     } catch(err){
         console.error('setRemoteDescription(answer) ERROR: ', err);
     }
-}
-
-// P2P通信を切断する
-function hangUp(){
-    if (peerConnection) {
-        if(peerConnection.iceConnectionState !== 'closed'){
-            peerConnection.close();
-            peerConnection = null;
-            negotiationneededCounter = 0;
-            const message = JSON.stringify({ type: 'close' });
-            console.log('sending close message');
-            ws.send(message);
-            cleanupVideoElement(remoteVideo);
-            textForSendSdp.value = '';
-            textToReceiveSdp.value = '';
-            return;
-        }
-    }
-    console.log('peerConnection is closed.');
 }
