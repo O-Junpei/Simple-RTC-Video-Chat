@@ -33,7 +33,37 @@ function readOfferSDP() {
     offer_sdp = offer_sdp.replace(/SPACE/g, ' ');  // "a-b-c"
     offer_sdp = offer_sdp.replace(/<br>/g, '\n');
     textToReceiveSdp.value = offer_sdp;
+  });
+}
+
+function setAnswerSDP() {
+  console.log('@@@@@');
+  console.log('setAnswerSDP');
+  console.log('@@@@@');
+  var answerSDP = textForSendSdp.value;
+  answerSDP = answerSDP.replace(/ /g, 'SPACE');  // "a-b-c"
+  answerSDP = answerSDP.replace(/\r?\n/g, '<br>');
+  $.getJSON('http://localhost:8000/set-answer.php?name=onojun&answer_sdp=' + answerSDP, function(data) {
+    console.log('@@@@@@@');
+    console.log(data);
+    console.log('@@@@@@@');
 });
+}
+
+function readAnswerSDP() {
+  console.log('@@@@@');
+  console.log('readAnswerSDP');
+  console.log('@@@@@');
+
+  $.getJSON('http://localhost:8000/read-answer.php?name=onojun', function(data) {
+    console.log('@@@@@@@');
+    console.log(data['answer_sdp']);
+    console.log('@@@@@@@');
+    var answer_sdp = data['answer_sdp'];
+    answer_sdp = answer_sdp.replace(/SPACE/g, ' ');  // "a-b-c"
+    answer_sdp = answer_sdp.replace(/<br>/g, '\n');
+    textToReceiveSdp.value = answer_sdp;
+  });
 }
 
 
