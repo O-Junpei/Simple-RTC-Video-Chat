@@ -8,10 +8,39 @@ let negotiationneededCounter = 0;
 let isOffer = false;
 
 
+// setOfferボタンが押されたら
+function setOfferSDP() {
+    console.log('setOffer');
+    console.log(textForSendSdp.value)
+    var rowText = textForSendSdp.value;
+    rowText = rowText.replace(/ /g, 'SPACE');  // "a-b-c"
+    rowText = rowText.replace(/\r?\n/g, '<br>');
+    console.log(rowText);
+
+    $.getJSON('http://localhost:8000/set-offer.php?name=onojun&offer_sdp=' + rowText, function(data) {
+      console.log('@@@@@@@');
+      console.log(data);
+      console.log('@@@@@@@');
+  });
+}
+
+function readOfferSDP() {
+  $.getJSON('http://localhost:8000/read-offer.php?name=onojun', function(data) {
+    console.log('@@@@@@@');
+    console.log(data['offer_sdp']);
+    console.log('@@@@@@@');
+    var offer_sdp = data['offer_sdp'];
+    offer_sdp = offer_sdp.replace(/SPACE/g, ' ');  // "a-b-c"
+    offer_sdp = offer_sdp.replace(/<br>/g, '\n');
+    textToReceiveSdp.value = offer_sdp;
+});
+}
+
+
 // getUserMediaでカメラ、マイクにアクセス
 async function startVideo() {
     try{
-        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
         playVideo(localVideo,localStream);
     } catch(err){
         console.error('mediaDevice.getUserMedia() error:', err);
