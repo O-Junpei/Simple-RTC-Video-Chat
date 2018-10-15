@@ -11,7 +11,7 @@ let isOffer = false;
 // getUserMediaでカメラ、マイクにアクセス
 async function startVideo() {
     try{
-        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
         playVideo(localVideo,localStream);
     } catch(err){
         console.error('mediaDevice.getUserMedia() error:', err);
