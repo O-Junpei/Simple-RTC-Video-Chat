@@ -7,6 +7,8 @@ let peerConnection = null;
 let negotiationneededCounter = 0;
 let isOffer = false;
 
+//const apiUrl = 'http://localhost:8000/';
+const apiUrl = 'https://swiswiswift.com/contents/chat/';
 
 // setOfferボタンが押されたら
 function setOfferSDP() {
@@ -17,7 +19,7 @@ function setOfferSDP() {
     rowText = rowText.replace(/\r?\n/g, '<br>');
     console.log(rowText);
 
-    $.getJSON('http://localhost:8000/set-offer.php?name=onojun&offer_sdp=' + rowText, function(data) {
+    $.getJSON(apiUrl + 'set-offer.php?name=onojun&offer_sdp=' + rowText, function(data) {
       console.log('@@@@@@@');
       console.log(data);
       console.log('@@@@@@@');
@@ -25,7 +27,7 @@ function setOfferSDP() {
 }
 
 function readOfferSDP() {
-  $.getJSON('http://localhost:8000/read-offer.php?name=onojun', function(data) {
+  $.getJSON(apiUrl + 'read-offer.php?name=onojun', function(data) {
     console.log('@@@@@@@');
     console.log(data['offer_sdp']);
     console.log('@@@@@@@');
@@ -43,7 +45,7 @@ function setAnswerSDP() {
   var answerSDP = textForSendSdp.value;
   answerSDP = answerSDP.replace(/ /g, 'SPACE');  // "a-b-c"
   answerSDP = answerSDP.replace(/\r?\n/g, '<br>');
-  $.getJSON('http://localhost:8000/set-answer.php?name=onojun&answer_sdp=' + answerSDP, function(data) {
+  $.getJSON(apiUrl + 'set-answer.php?name=onojun&answer_sdp=' + answerSDP, function(data) {
     console.log('@@@@@@@');
     console.log(data);
     console.log('@@@@@@@');
@@ -55,7 +57,7 @@ function readAnswerSDP() {
   console.log('readAnswerSDP');
   console.log('@@@@@');
 
-  $.getJSON('http://localhost:8000/read-answer.php?name=onojun', function(data) {
+  $.getJSON(apiUrl + 'read-answer.php?name=onojun', function(data) {
     console.log('@@@@@@@');
     console.log(data['answer_sdp']);
     console.log('@@@@@@@');
@@ -70,7 +72,7 @@ function readAnswerSDP() {
 // getUserMediaでカメラ、マイクにアクセス
 async function startVideo() {
     try{
-        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+        localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
         playVideo(localVideo,localStream);
     } catch(err){
         console.error('mediaDevice.getUserMedia() error:', err);
