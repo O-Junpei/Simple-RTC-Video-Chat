@@ -7,67 +7,110 @@ let peerConnection = null;
 let negotiationneededCounter = 0;
 let isOffer = false;
 
-//const apiUrl = 'http://localhost:8000/';
-const apiUrl = 'https://swiswiswift.com/contents/chat/';
+// apiのファイルの階層を取得
+let apiUrl = location.href;
+console.log(apiUrl.substr(0, apiUrl.lastIndexOf( '/' ) + 1));
+apiUrl = apiUrl.substr(0, apiUrl.lastIndexOf( '/' ) + 1);
+
+// getで送れるようにSDP中のスペースとタブを変換
+function convertSdpString(str) {
+  return str.replace(/ /g, '<SPACE>').replace(/\r?\n/g, '<BR>');
+}
+
+// getで送れるようにSDP中のスペースとタブを変換
+function unconvertSdpString(str) {
+  return str.replace(/<SPACE>/g, ' ').replace(/<BR>/g, '\n');
+}
 
 // setOfferボタンが押されたら
 function setOfferSDP() {
-    console.log('setOffer');
-    console.log(textForSendSdp.value)
-    var rowText = textForSendSdp.value;
-    rowText = rowText.replace(/ /g, 'SPACE');  // "a-b-c"
-    rowText = rowText.replace(/\r?\n/g, '<br>');
-    console.log(rowText);
-
-    $.getJSON(apiUrl + 'set-offer.php?name=onojun&offer_sdp=' + rowText, function(data) {
-      console.log('@@@@@@@');
-      console.log(data);
-      console.log('@@@@@@@');
+  var offerSdp = convertSdpString(textForSendSdp.value);
+  $.ajax({
+    url: apiUrl + 'set-offer.php?name=onojun&offer_sdp=' + offerSdp,
+    type: 'GET',
+    success: function(data){
+        let json = JSON.parse(data);
+        if (json['is_success']) {
+          console.log('seted offer sdp.')
+        } else {
+          console.log('error');
+        }
+    },
+    error: function(data) {
+      console.log('set offer failed.')
+      alert(data);
+    }
   });
 }
 
+// readOfferボタンが押されたら
 function readOfferSDP() {
-  $.getJSON(apiUrl + 'read-offer.php?name=onojun', function(data) {
-    console.log('@@@@@@@');
-    console.log(data['offer_sdp']);
-    console.log('@@@@@@@');
-    var offer_sdp = data['offer_sdp'];
-    offer_sdp = offer_sdp.replace(/SPACE/g, ' ');  // "a-b-c"
-    offer_sdp = offer_sdp.replace(/<br>/g, '\n');
-    textToReceiveSdp.value = offer_sdp;
+  $.ajax({
+    url: apiUrl + 'read-offer.php?name=onojun',
+    type: 'GET',
+    success: function(data){
+        let json = JSON.parse(data);
+        console.log(json);
+        if (json['is_success']) {
+          // textareaに表示
+          textToReceiveSdp.value = unconvertSdpString(json['offer_sdp']);
+          console.log('read offer sdp.')
+        } else {
+          console.log('error');
+        }
+    },
+    error: function(data) {
+      console.log('read offer sdp failed.')
+      alert(data);
+    }
   });
 }
 
+// setAnswerボタンが押されたら
 function setAnswerSDP() {
-  console.log('@@@@@');
-  console.log('setAnswerSDP');
-  console.log('@@@@@');
-  var answerSDP = textForSendSdp.value;
-  answerSDP = answerSDP.replace(/ /g, 'SPACE');  // "a-b-c"
-  answerSDP = answerSDP.replace(/\r?\n/g, '<br>');
-  $.getJSON(apiUrl + 'set-answer.php?name=onojun&answer_sdp=' + answerSDP, function(data) {
-    console.log('@@@@@@@');
-    console.log(data);
-    console.log('@@@@@@@');
-});
+  var answerSDP = convertSdpString(textForSendSdp.value);
+  $.ajax({
+    url: apiUrl + 'set-answer.php?name=onojun&answer_sdp=' + answerSDP,
+    type: 'GET',
+    success: function(data){
+        let json = JSON.parse(data);
+        console.log(json);
+        if (json['is_success']) {
+          console.log('seted answer sdp.')
+        } else {
+          console.log('error');
+        }
+    },
+    error: function(data) {
+      console.log('read answer sdp failed.')
+      alert(data);
+    }
+  });
+
 }
 
+// readAnswerボタンが押されたら
 function readAnswerSDP() {
-  console.log('@@@@@');
-  console.log('readAnswerSDP');
-  console.log('@@@@@');
-
-  $.getJSON(apiUrl + 'read-answer.php?name=onojun', function(data) {
-    console.log('@@@@@@@');
-    console.log(data['answer_sdp']);
-    console.log('@@@@@@@');
-    var answer_sdp = data['answer_sdp'];
-    answer_sdp = answer_sdp.replace(/SPACE/g, ' ');  // "a-b-c"
-    answer_sdp = answer_sdp.replace(/<br>/g, '\n');
-    textToReceiveSdp.value = answer_sdp;
+  $.ajax({
+    url: apiUrl + 'read-answer.php?name=onojun',
+    type: 'GET',
+    success: function(data){
+        let json = JSON.parse(data);
+        console.log(json);
+        if (json['is_success']) {
+          // textareaに表示
+          textToReceiveSdp.value = unconvertSdpString(json['answer_sdp']);
+          console.log('read answer sdp.')
+        } else {
+          console.log('error');
+        }
+    },
+    error: function(data) {
+      console.log('read answer sdp failed.')
+      alert(data);
+    }
   });
 }
-
 
 // getUserMediaでカメラ、マイクにアクセス
 async function startVideo() {
