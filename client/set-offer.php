@@ -4,8 +4,8 @@
 header("Access-Control-Allow-Origin: *");
 
 // getの受け取り
-$name = $_GET['name'];
-$offer_sdp = $_GET['offer_sdp'];
+$name = $_POST['name'];
+$offer_sdp = $_POST['offer_sdp'];
 
 // dbを読み込む
 $url = "db.json";

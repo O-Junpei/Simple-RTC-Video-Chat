@@ -26,10 +26,15 @@ function unconvertSdpString(str) {
 function setOfferSDP() {
   var offerSdp = convertSdpString(textForSendSdp.value);
   $.ajax({
-    url: apiUrl + 'set-offer.php?name=onojun&offer_sdp=' + offerSdp,
-    type: 'GET',
+    url: apiUrl + 'set-offer.php',
+    type: 'POST',
+    data : {
+      name : "onojun",
+      offer_sdp : offerSdp
+    },
     success: function(data){
         let json = JSON.parse(data);
+        console.log(json);
         if (json['is_success']) {
           console.log('seted offer sdp.')
         } else {
@@ -38,6 +43,7 @@ function setOfferSDP() {
     },
     error: function(data) {
       console.log('set offer failed.')
+      console.log(data);
       alert(data);
     }
   });
@@ -70,8 +76,12 @@ function readOfferSDP() {
 function setAnswerSDP() {
   var answerSDP = convertSdpString(textForSendSdp.value);
   $.ajax({
-    url: apiUrl + 'set-answer.php?name=onojun&answer_sdp=' + answerSDP,
-    type: 'GET',
+    url: apiUrl + 'set-answer.php',
+    type: 'POST',
+    data : {
+      name : "onojun",
+      answer_sdp : answerSDP
+    },
     success: function(data){
         let json = JSON.parse(data);
         console.log(json);
