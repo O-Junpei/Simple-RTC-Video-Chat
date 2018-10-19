@@ -7,6 +7,11 @@ let peerConnection = null;
 let negotiationneededCounter = 0;
 let isOffer = false;
 
+
+window.onload = function() {
+    //alert("ページが読み込まれました！");
+};
+
 // apiのファイルの階層を取得
 let apiUrl = location.href;
 console.log(apiUrl.substr(0, apiUrl.lastIndexOf( '/' ) + 1));
@@ -127,6 +132,7 @@ async function startVideo() {
     try{
         localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
         playVideo(localVideo,localStream);
+        //alert('aaaa');
     } catch(err){
         console.error('mediaDevice.getUserMedia() error:', err);
     }
@@ -136,6 +142,10 @@ async function startVideo() {
 async function playVideo(element, stream) {
     element.srcObject = stream;
     await element.play();
+    console.log('played');
+    sleep(3000);
+    // 5秒後にメッセージを表示
+    console.log('5秒経過しました！');
 }
 
 
@@ -176,7 +186,7 @@ function prepareNewConnection(isOffer) {
         } catch(err){
             console.error('setLocalDescription(offer) ERROR: ', err);
         }
-    }
+    };
 
     // ローカルのMediaStreamを利用できるようにする
     if (localStream) {
