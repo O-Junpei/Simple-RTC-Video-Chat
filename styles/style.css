@@ -5,29 +5,34 @@ body {
   margin: 0;
 }
 
-#base {
+.base {
   position: relative;
 }
 
-#remote_video {
-  width: 100vw;
-  height: 100vh;
-  border: 1px solid black;
-  background-color: red;
-}
-
-#buttons {
+.buttons {
   background-color: #99cc00;
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   z-index: 2;
 }
 
-#myVideo {
+.button > img {
+  width: 60px;
+  height: 60px;
+}
+
+#remoteVideo {
+  width: 100vw;
+  height: 100vh;
+}
+
+#localVideo {
   position: absolute;
   right: 0;
   bottom: 0;
   background-color: #99cc00;
   z-index: 3;
+  width: 320px;
+  height: 240px;
 }
